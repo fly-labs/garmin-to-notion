@@ -5,7 +5,7 @@ on:
     - cron: '0 1 * * *' # Daily
   workflow_dispatch:
 env:
-  TZ: 'America/Montreal'
+  TZ: 'America/Sao_Paulo'
 
 jobs:
   sync:
