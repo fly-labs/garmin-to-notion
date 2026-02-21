@@ -20,22 +20,22 @@ MODALIDADE_MAP = {
     "Indoor Cycling": "Bike Indoor",
     "Casual Walking": "Caminhada",
     "Speed Walking": "Caminhada",
-    "Strength Training": "Treino de Forca",
+    "Strength Training": "Treino de Força",
     "Stair Climbing": "Caminhada",
     "Pilates": "Fisioterapia",  # Luiz uses Pilates on Garmin for Fisioterapia
     "Yoga": "Fisioterapia",
-    "Lap Swimming": "Natacao",
-    "Open Water Swimming": "Natacao",
+    "Lap Swimming": "Natação",
+    "Open Water Swimming": "Natação",
     "Virtual Ride": "Bike Indoor",
     "Mixed Martial Arts": "BJJ",
     "Hiit": "HIIT",
     # Activity Type mappings (fallback)
-    "Strength": "Treino de Forca",
+    "Strength": "Treino de Força",
     "Running": "Corrida",
     "Cycling": "Bike Indoor",
     "BJJ": "BJJ",
-    "Swimming": "Natacao",
-    "Lap Swimming": "Natacao",
+    "Swimming": "Natação",
+    "Lap Swimming": "Natação",
     "Walking": "Caminhada",
     "Yoga/Pilates": "Fisioterapia",
     "Hiit": "HIIT",
@@ -50,7 +50,7 @@ INTENSIDADE_MAP = {
     "Improving": "Moderado",
     "Maintaining": "Moderado",
     "Some Benefit": "Leve",
-    "Recovery": "Leve",
+    "Recovery": "Recovery",
     "No Benefit": "Leve",
     "Unknown": "Moderado",
 }
@@ -58,6 +58,14 @@ INTENSIDADE_MAP = {
 # Activity Name overrides (for custom Garmin activities where type is "Other")
 NAME_OVERRIDE_MAP = {
     "Sauna": "Sauna",
+}
+
+# Activity Name -> Modalidade for renaming titles in Treinos
+TITLE_TO_MODALIDADE = {
+    "Strength": "Treino de Força",
+    "Força": "Treino de Força",
+    "Pool Swim": "Natação",
+    "Natação": "Natação",
 }
 
 # Skip these - not real workouts
