@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 from garminconnect import Garmin as GarminClient
 from notion_client import Client as NotionClient
 
-# Your local time zone, replace with the appropriate one if needed
-local_tz = pytz.timezone('America/Toronto')
+# Your local time zone
+local_tz = pytz.timezone('America/Sao_Paulo')
 
 ACTIVITY_ICONS = {
     "Barre": "https://img.icons8.com/?size=100&id=66924&format=png&color=000000",
@@ -115,6 +115,16 @@ def format_pace(average_speed: float) -> str:
         return ""
 
 
+def gmt_to_local(gmt_string: str) -> datetime:
+    """Convert a GMT datetime string from Garmin to local timezone datetime."""
+    return (
+        datetime
+        .strptime(gmt_string, '%Y-%m-%d %H:%M:%S')
+        .replace(tzinfo=UTC)
+        .astimezone(local_tz)
+    )
+
+
 def activity_exists(
     notion_client: NotionClient,
     database_id: str,
@@ -195,18 +205,21 @@ def activity_needs_update(existing_activity: dict, new_activity: dict) -> bool:
 
 def create_activity(notion_client: NotionClient, database_id: str, activity: dict) -> None:
     # Create a new activity in the Notion database
-    activity_date = activity.get('startTimeGMT')
+    activity_date_raw: str = activity.get('startTimeGMT')
     activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
     activity_type, activity_subtype = format_activity_type(
         activity.get('activityType', {}).get('typeKey', 'Unknown'),
         activity_name
     )
 
+    # Convert GMT to local timezone
+    local_date = gmt_to_local(activity_date_raw)
+
     # Get icon for the activity type
     icon_url = ACTIVITY_ICONS.get(activity_subtype if activity_subtype != activity_type else activity_type)
 
     properties = {
-        "Date": {"date": {"start": activity_date}},
+        "Date": {"date": {"start": local_date.strftime('%Y-%m-%dT%H:%M:%S')}},
         "Activity Type": {"select": {"name": activity_type}},
         "Subactivity Type": {"select": {"name": activity_subtype}},
         "Activity Name": {"title": [{"text": {"content": activity_name}}]},
@@ -248,10 +261,15 @@ def update_activity(notion_client: NotionClient, existing_activity: dict, new_ac
         activity_name
     )
 
+    # Convert GMT to local timezone for date update
+    activity_date_raw = new_activity.get('startTimeGMT')
+    local_date = gmt_to_local(activity_date_raw)
+
     # Get icon for the activity type
     icon_url = ACTIVITY_ICONS.get(activity_subtype if activity_subtype != activity_type else activity_type)
 
     properties = {
+        "Date": {"date": {"start": local_date.strftime('%Y-%m-%dT%H:%M:%S')}},
         "Activity Type": {"select": {"name": activity_type}},
         "Subactivity Type": {"select": {"name": activity_subtype}},
         "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
@@ -307,11 +325,7 @@ def main():
     # Process all activities
     for activity in activities:
         activity_date_raw: str = activity.get('startTimeGMT')
-        activity_date: datetime = (
-            datetime
-            .strptime(activity_date_raw, '%Y-%m-%d %H:%M:%S')  # Parse as format received from Garmin
-            .replace(tzinfo=UTC)  # Set timezone to UTC, as Garmin times are in GMT/UTC. Close enough.
-        )
+        activity_date: datetime = gmt_to_local(activity_date_raw)
 
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
         activity_type, activity_subtype = format_activity_type(
