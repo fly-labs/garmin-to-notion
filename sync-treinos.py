@@ -208,7 +208,6 @@ def main():
             updated += 1
         else:
             treino_props["Fonte"] = {"select": {"name": "Garmin"}}
-            treino_props["Completo"] = {"checkbox": True}
             treino_props["Garmin ID"] = {"rich_text": [{"text": {"content": garmin_id}}]}
             notion.pages.create(parent={"database_id": treinos_db_id}, properties=treino_props)
             created += 1
