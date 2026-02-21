@@ -111,6 +111,24 @@ def get_intensidade(aerobic_effect):
     return INTENSIDADE_MAP.get(aerobic_effect, "Moderado")
 
 
+# Modalidades where "Recovery" and "Leve" don't make sense - override to minimum
+INTENSIDADE_FLOOR = {
+    "HIIT": "Moderado",       # HIIT is at least moderate
+    "BJJ": "Moderado",        # BJJ is at least moderate
+}
+
+
+def apply_intensidade_floor(modalidade, intensidade):
+    """Override intensidade if it's below the floor for certain modalidades."""
+    floor = INTENSIDADE_FLOOR.get(modalidade)
+    if not floor:
+        return intensidade
+    rank = {"Recovery": 0, "Leve": 1, "Moderado": 2, "Intenso": 3}
+    if rank.get(intensidade, 2) < rank.get(floor, 2):
+        return floor
+    return intensidade
+
+
 def get_title(activity_name, modalidade):
     generic = {"unnamed activity", "unknown", ""}
     if activity_name.lower().strip() in generic:
@@ -143,6 +161,7 @@ def build_properties(activity_page):
 
     modalidade = get_modalidade(activity_type, subactivity_type, activity_name)
     intensidade = get_intensidade(aerobic_effect)
+    intensidade = apply_intensidade_floor(modalidade, intensidade)
     title = get_title(activity_name, modalidade)
 
     treino_props = {
@@ -223,7 +242,6 @@ def main():
             updated += 1
         else:
             treino_props["Fonte"] = {"select": {"name": "Garmin"}}
-            treino_props["Completo"] = {"checkbox": True}
             treino_props["Garmin ID"] = {"rich_text": [{"text": {"content": garmin_id}}]}
             notion.pages.create(parent={"database_id": treinos_db_id}, properties=treino_props)
             created += 1
