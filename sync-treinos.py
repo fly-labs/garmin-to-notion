@@ -55,6 +55,11 @@ INTENSIDADE_MAP = {
     "Unknown": "Moderado",
 }
 
+# Activity Name overrides (for custom Garmin activities where type is "Other")
+NAME_OVERRIDE_MAP = {
+    "Sauna": "Sauna",
+}
+
 # Skip these - not real workouts
 SKIP_TYPES = {"Breathwork", "Relaxation", "Meditation"}
 
@@ -83,8 +88,10 @@ def get_prop(props, name, prop_type):
     return None
 
 
-def get_modalidade(activity_type, subactivity_type):
-    """Determine Modalidade. Subtype takes priority."""
+def get_modalidade(activity_type, subactivity_type, activity_name=""):
+    """Determine Modalidade. Name override > Subtype > Type."""
+    if activity_name and activity_name in NAME_OVERRIDE_MAP:
+        return NAME_OVERRIDE_MAP[activity_name]
     if subactivity_type and subactivity_type in MODALIDADE_MAP:
         return MODALIDADE_MAP[subactivity_type]
     if activity_type and activity_type in MODALIDADE_MAP:
@@ -126,7 +133,7 @@ def build_properties(activity_page):
     avg_pace = get_prop(props, "Avg Pace", "rich_text") or ""
     aerobic_effect = get_prop(props, "Aerobic Effect", "select") or "Unknown"
 
-    modalidade = get_modalidade(activity_type, subactivity_type)
+    modalidade = get_modalidade(activity_type, subactivity_type, activity_name)
     intensidade = get_intensidade(aerobic_effect)
     title = get_title(activity_name, modalidade)
 
@@ -208,6 +215,7 @@ def main():
             updated += 1
         else:
             treino_props["Fonte"] = {"select": {"name": "Garmin"}}
+            treino_props["Completo"] = {"checkbox": True}
             treino_props["Garmin ID"] = {"rich_text": [{"text": {"content": garmin_id}}]}
             notion.pages.create(parent={"database_id": treinos_db_id}, properties=treino_props)
             created += 1
