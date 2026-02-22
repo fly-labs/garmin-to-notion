@@ -4,7 +4,10 @@ Reads from the Activities database (Fitness Tracker Template) and
 copies/updates entries into the Treinos database.
 
 Runs AFTER garmin-activities.py in the same workflow.
-Uses Notion page ID of the Activities entry as unique key to avoid duplicates.
+
+FIX (2025-02): Changed unique key from Notion page ID (which changes on every
+garmin-activities.py run) to a composite fingerprint of date + activity name.
+This prevents duplicates when Activities pages are recreated.
 """
 import os
 from dotenv import load_dotenv
@@ -21,6 +24,7 @@ MODALIDADE_MAP = {
     "Casual Walking": "Caminhada",
     "Speed Walking": "Caminhada",
     "Strength Training": "Treino de Força",
+    "Strength": "Treino de Força",
     "Stair Climbing": "Caminhada",
     "Pilates": "Fisioterapia",  # Luiz uses Pilates on Garmin for Fisioterapia
     "Yoga": "Fisioterapia",
@@ -30,16 +34,12 @@ MODALIDADE_MAP = {
     "Mixed Martial Arts": "BJJ",
     "Hiit": "HIIT",
     # Activity Type mappings (fallback)
-    "Strength": "Treino de Força",
     "Running": "Corrida",
     "Cycling": "Bike Indoor",
     "BJJ": "BJJ",
     "Swimming": "Natação",
-    "Lap Swimming": "Natação",
     "Walking": "Caminhada",
     "Yoga/Pilates": "Fisioterapia",
-    "Hiit": "HIIT",
-    "Stair Climbing": "Caminhada",
 }
 
 # Aerobic Effect -> Intensidade
@@ -60,12 +60,10 @@ NAME_OVERRIDE_MAP = {
     "Sauna": "Sauna",
 }
 
-# Activity Name -> Modalidade for renaming titles in Treinos
-TITLE_TO_MODALIDADE = {
-    "Strength": "Treino de Força",
-    "Força": "Treino de Força",
-    "Pool Swim": "Natação",
-    "Natação": "Natação",
+# Modalidades where "Recovery" and "Leve" don't make sense - override to minimum
+INTENSIDADE_FLOOR = {
+    "HIIT": "Moderado",
+    "BJJ": "Moderado",
 }
 
 # Skip these - not real workouts
@@ -111,13 +109,6 @@ def get_intensidade(aerobic_effect):
     return INTENSIDADE_MAP.get(aerobic_effect, "Moderado")
 
 
-# Modalidades where "Recovery" and "Leve" don't make sense - override to minimum
-INTENSIDADE_FLOOR = {
-    "HIIT": "Moderado",       # HIIT is at least moderate
-    "BJJ": "Moderado",        # BJJ is at least moderate
-}
-
-
 def apply_intensidade_floor(modalidade, intensidade):
     """Override intensidade if it's below the floor for certain modalidades."""
     floor = INTENSIDADE_FLOOR.get(modalidade)
@@ -136,13 +127,44 @@ def get_title(activity_name, modalidade):
     return activity_name
 
 
-def treino_exists(notion, db_id, garmin_id):
+def make_fingerprint(date_str, title):
+    """Composite key used to detect duplicates: date (YYYY-MM-DD) + title."""
+    date_part = (date_str or "")[:10]
+    return f"{date_part}|{title}"
+
+
+def treino_exists(notion, db_id, date_str, title):
+    """
+    Check if a treino already exists by date + title composite key.
+    Queries the Garmin ID field (which stores our fingerprint) for an exact match.
+    Falls back to querying date + title directly in case of legacy records.
+    """
+    fingerprint = make_fingerprint(date_str, title)
+
+    # Primary: look up by fingerprint stored in Garmin ID field
     query = notion.databases.query(
         database_id=db_id,
-        filter={"property": "Garmin ID", "rich_text": {"equals": garmin_id}}
+        filter={"property": "Garmin ID", "rich_text": {"equals": fingerprint}}
     )
-    results = query["results"]
-    return results[0] if results else None
+    if query["results"]:
+        return query["results"][0]
+
+    # Fallback: legacy records may have Notion page ID in Garmin ID — match by date+title
+    if date_str:
+        date_only = date_str[:10]
+        query2 = notion.databases.query(
+            database_id=db_id,
+            filter={
+                "and": [
+                    {"property": "Data", "date": {"equals": date_only}},
+                    {"property": "Treino", "title": {"equals": title}},
+                ]
+            }
+        )
+        if query2["results"]:
+            return query2["results"][0]
+
+    return None
 
 
 def build_properties(activity_page):
@@ -181,7 +203,7 @@ def build_properties(activity_page):
     if avg_pace and avg_pace.strip():
         treino_props["Pace Médio"] = {"rich_text": [{"text": {"content": avg_pace}}]}
 
-    return treino_props
+    return treino_props, title, date_start
 
 
 def fetch_all_pages(notion, database_id):
@@ -231,22 +253,25 @@ def main():
             skipped += 1
             continue
 
-        garmin_id = activity["id"]  # Notion page ID as unique key
+        treino_props, title, date_start = build_properties(activity)
 
-        existing = treino_exists(notion, treinos_db_id, garmin_id)
-
-        treino_props = build_properties(activity)
+        existing = treino_exists(notion, treinos_db_id, date_start, title)
 
         if existing:
             notion.pages.update(page_id=existing["id"], properties=treino_props)
             updated += 1
         else:
+            fingerprint = make_fingerprint(date_start, title)
             treino_props["Fonte"] = {"select": {"name": "Garmin"}}
-            treino_props["Garmin ID"] = {"rich_text": [{"text": {"content": garmin_id}}]}
-            notion.pages.create(parent={"database_id": treinos_db_id}, properties=treino_props)
+            treino_props["Garmin ID"] = {"rich_text": [{"text": {"content": fingerprint}}]}
+            notion.pages.create(
+                parent={"database_id": treinos_db_id},
+                properties=treino_props
+            )
             created += 1
+            print(f"  Created: {title} ({date_start})")
 
-    print(f"Treinos sync: {created} created, {updated} updated, {skipped} skipped")
+    print(f"\nTreinos sync done: {created} created, {updated} updated, {skipped} skipped")
 
 
 if __name__ == "__main__":
