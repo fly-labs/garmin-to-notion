@@ -4,9 +4,9 @@ Create a page called "Fitness Tracker" with the icon 🏋️ and no description.
 
 RIGHT AT THE TOP of the page, before anything else, add a callout block with a 👋 icon and a light warm background. Inside the callout, write this text exactly:
 
-"Hey! I'm Luiz — I built this system to automatically sync my Garmin data into Notion. It became such a core part of my routine that I decided to open-source it and share it with everyone.
+"Hey! I'm Luiz — I built this system to automatically sync Garmin data into Notion. It became such a core part of my routine that I decided to open-source it and share it with everyone.
 
-Thanks for using Fitness Tracker! If you have feedback, ideas, or just want to say hi — drop me a line at talktoflyflabs@gmail.com"
+Thanks for using Fitness Tracker! If you have feedback, ideas, or just want to say hi — reach out at luiz@flylabs.fun or visit github.com/fly-labs/garmin-to-notion."
 
 After the callout, add a small empty line for spacing.
 
