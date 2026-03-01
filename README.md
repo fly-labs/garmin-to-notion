@@ -214,6 +214,14 @@ Other projects that inspired this work:
 - [python-garminconnect](https://github.com/cyberjunky/python-garminconnect) — Garmin API wrapper
 - [n-kratz/garmin-notion](https://github.com/n-kratz/garmin-notion) — alternative Garmin-Notion integration
 
+## Contact
+
+Built by [FlyLabs](https://flylabs.fun).
+
+- Email: luiz@flylabs.fun
+- Website: [flylabs.fun](https://flylabs.fun)
+- GitHub: [fly-labs](https://github.com/fly-labs)
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
