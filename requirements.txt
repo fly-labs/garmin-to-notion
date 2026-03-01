@@ -1,10 +1,4 @@
 garminconnect>=0.2.19,<0.3
 notion-client==2.2.1
-pytz==2024.1
-datetime==5.5
-withings-sync==4.2.4
-lxml>=4.6.0,<5.0
-
-
-
-python-dotenv
+python-dotenv>=1.0,<2.0
+tzdata>=2024.1; sys_platform == "win32"

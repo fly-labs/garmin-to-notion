@@ -1,0 +1,276 @@
+Create a page called "Fitness Tracker" with the icon 🏋️ and no description.
+
+---
+
+RIGHT AT THE TOP of the page, before anything else, add a callout block with a 👋 icon and a light warm background. Inside the callout, write this text exactly:
+
+"Hey! I'm Luiz — I built this system to automatically sync my Garmin data into Notion. It became such a core part of my routine that I decided to open-source it and share it with everyone.
+
+Thanks for using Fitness Tracker! If you have feedback, ideas, or just want to say hi — drop me a line at talktoflyflabs@gmail.com"
+
+After the callout, add a small empty line for spacing.
+
+---
+
+Now create these 6 full-width inline databases IN THIS EXACT ORDER.
+
+IMPORTANT — Date filters: Whenever a filter says "on or after [date]", use the Date filter → "is on or after" → type the date shown. These are temporary placeholders — I will convert them to relative filters ("Past year", "This month", etc.) after creation. Just set the exact dates shown below.
+
+---
+
+1. Database "Activity Summary"
+
+Properties (in this order):
+- Name (Title)
+- Period (Select) — options: Month (purple), Year (green)
+- Modality (Select) — options: All (gray), Running (green), Outdoor Cycling (blue), Indoor Cycling (blue), Swimming (purple), Walking (orange), Strength Training (red), BJJ (brown), HIIT (pink), Yoga (purple), Pilates (gray), Sauna (yellow), Crossfit (red), Racquet Sports (blue), Team Sports (green), Combat Sports (brown), Winter Sports (blue), Water Sports (purple), Climbing (orange), Golf (green), Dance (pink), Multi Sport (gray), Other (gray)
+- Start (Date)
+- End (Date)
+- Total Workouts (Number, integer)
+- Active Days (Number, integer)
+- Total Duration (min) (Number, integer)
+- Total Distance (km) (Number, format: number with 1 decimal)
+- Total Calories (Number, integer)
+- Avg per Week (Number, format: number with 1 decimal)
+- Avg HR (Number, integer)
+- Avg Sleep (Rich text)
+- Avg Sleep Score (Number, integer)
+- Avg Resting HR (Number, integer)
+- Avg Steps (Number, integer)
+- Step Goal % (Number, integer)
+- Top Modality (Rich text)
+- Breakdown (Rich text)
+
+Create exactly 6 views:
+
+- "Overview" — Table view. DEFAULT VIEW.
+  Filter: 3 conditions, AND:
+    Modality is "All"
+    Period is "Month"
+    Start is on or after 2025-03-01
+  Sort: Start descending.
+  Show columns: Name, Total Workouts, Active Days, Total Duration (min), Total Distance (km), Total Calories, Avg per Week, Avg HR, Avg Sleep, Avg Sleep Score, Avg Resting HR, Avg Steps, Step Goal %.
+  Hide columns: Period, Modality, Start, End, Top Modality, Breakdown.
+
+- "This Month" — Table view.
+  Filter: 2 conditions, AND:
+    Period is "Month"
+    Start is on or after 2026-03-01
+  Sort: Total Workouts descending.
+  Show columns: Modality, Total Workouts, Total Duration (min), Total Distance (km), Total Calories, Avg per Week, Avg HR.
+  Hide columns: Name, Period, Start, End, Top Modality, Breakdown, Active Days, Avg Sleep, Avg Sleep Score, Avg Resting HR, Avg Steps, Step Goal %.
+
+- "Year to Date" — Table view.
+  Filter: 2 conditions, AND:
+    Period is "Year"
+    Start is on or after 2026-01-01
+  Sort: Total Workouts descending.
+  Show columns: Modality, Total Workouts, Total Duration (min), Total Distance (km), Total Calories, Avg per Week, Avg HR.
+  Hide columns: Name, Period, Start, End, Top Modality, Breakdown, Active Days, Avg Sleep, Avg Sleep Score, Avg Resting HR, Avg Steps, Step Goal %.
+
+- "Yearly" — Table view.
+  Filter: 2 conditions, AND:
+    Period is "Year"
+    Modality is "All"
+  Sort: Start descending.
+  Show columns: Name, Total Workouts, Active Days, Total Duration (min), Total Distance (km), Total Calories, Avg per Week, Avg HR, Avg Sleep, Avg Sleep Score, Avg Resting HR, Avg Steps, Step Goal %.
+  Hide columns: Period, Modality, Start, End, Top Modality, Breakdown.
+
+- "Monthly Trend" — CHART view.
+  Chart type: Vertical bar.
+  Filter: 3 conditions, AND:
+    Modality is "All"
+    Period is "Month"
+    Start is on or after 2025-03-01
+  X-axis: select the property called "Start" (it is a Date property).
+  Y-axis: select the property called "Total Workouts" (it is a Number property). Do NOT choose "Count" — choose the actual property "Total Workouts".
+  Sort: ascending (oldest month on the left, newest month on the right).
+  Do NOT group by anything. Do NOT add a color/slice property.
+  Style: medium height, show data labels, show grid lines.
+
+- "Sport Distribution" — CHART view.
+  Chart type: Donut.
+  Filter: 3 conditions, AND:
+    Period is "Year"
+    Start is on or after 2026-01-01
+    Modality is not "All"
+  Measure: select the property called "Total Workouts" (Number property, NOT "Count").
+  Slice by: Modality.
+  Style: medium height, show data labels, show legend.
+
+---
+
+2. Database "Workouts"
+
+Properties:
+- Workout (Title)
+- Date (Date)
+- Modality (Select) — same options and colors as Activity Summary's Modality (without "All")
+- Intensity (Select) — options: Easy (green), Moderate (yellow), Hard (orange), Maximum (red)
+- Duration (Rich text)
+- Distance (km) (Number, format: number with 2 decimals)
+- Calories (Number)
+- Avg HR (Number, integer)
+- Avg Pace (Rich text)
+- Source (URL)
+- Garmin ID (Number)
+
+Create exactly 4 views:
+
+- "Recent" — Table view. DEFAULT VIEW.
+  Filter: Date is on or after 2026-02-01.
+  Sort: Date descending.
+  Show: Workout, Date, Modality, Intensity, Duration, Distance (km), Calories, Avg HR.
+  Hide: Avg Pace, Source, Garmin ID.
+
+- "All Workouts" — Table view. No filter. Sort: Date descending. Show all columns.
+
+- "By Modality" — Board view, grouped by Modality. Sort: Date descending.
+  Card preview: show only Date and Duration. Hide all other properties on cards.
+
+- "Calendar" — Calendar view by Date.
+
+---
+
+3. Database "Daily Steps"
+
+Properties:
+- Name (Title) — displays step count, e.g. "8,450 steps"
+- Date (Date)
+- Steps (Number)
+- Goal (Number)
+- Distance (km) (Number, format: number with 2 decimals)
+
+Create exactly 3 views:
+
+- "Calendar" — Calendar view by Date. No filter. DEFAULT VIEW.
+- "Recent" — Table view. Filter: Date is on or after 2026-02-01. Sort: Date descending.
+- "All Days" — Table view. No filter. Sort: Date descending.
+
+---
+
+4. Database "Sleep"
+
+Properties:
+- Name (Title) — displays sleep duration, e.g. "7h 45m"
+- Date (Date)
+- Duration (Rich text)
+- Score (Number, integer)
+- Deep (Rich text)
+- Light (Rich text)
+- REM (Rich text)
+- Awake (Rich text)
+- Resting HR (Number)
+
+Create exactly 4 views:
+
+- "Calendar" — Calendar view by Date. No filter. DEFAULT VIEW.
+- "Recent" — Table view. Filter: Date is on or after 2026-02-01. Sort: Date descending.
+- "All Nights" — Table view. No filter. Sort: Date descending.
+
+- "Sleep Score Trend" — CHART view.
+  Chart type: Line.
+  Filter: 2 conditions, AND:
+    Date is on or after 2026-02-01
+    Score is not empty
+  X-axis: select the property called "Date" (it is a Date property).
+  Y-axis: select the property called "Score" (it is a Number property). Do NOT choose "Count" — choose the actual property "Score".
+  Sort: ascending (oldest date on the left, newest date on the right).
+  Do NOT group by anything. Do NOT add a color/slice property.
+  Style: medium height, smooth line, gradient area fill, show data labels.
+
+---
+
+Now add a centered text block with the content "─── Raw Data ───" in light gray color. This acts as a visual divider.
+
+---
+
+5. Database "Activities"
+
+Properties:
+- Name (Title)
+- Date (Date)
+- Type (Select) — options: Running (green), Cycling (blue), Swimming (purple), Walking (orange), Strength (red), HIIT (pink), Cardio (yellow), Rowing (blue), Yoga/Pilates (purple), Combat Sports (brown), Racquet Sports (blue), Team Sports (green), Winter Sports (blue), Water Sports (purple), Climbing (orange), Multi Sport (gray), Other (gray)
+- SubType (Select) — no predefined options, created automatically
+- Distance (km) (Number, format: number with 2 decimals)
+- Duration (Rich text)
+- Avg Pace (Rich text)
+- Avg HR (Number)
+- Max HR (Number)
+- Calories (Number)
+- Avg Power (Number)
+- Training Effect (Rich text)
+- Aerobic Effect (Rich text)
+- Anaerobic Effect (Rich text)
+- Steps (Number)
+- Day of Week (Select) — options: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
+- Hour Block (Select) — options: 00:00-02:00, 02:00-04:00, 04:00-06:00, 06:00-08:00, 08:00-10:00, 10:00-12:00, 12:00-14:00, 14:00-16:00, 16:00-18:00, 18:00-20:00, 20:00-22:00, 22:00-24:00
+- Garmin ID (Number)
+
+Create exactly 4 views:
+
+- "Recent" — Table view. DEFAULT VIEW.
+  Filter: Date is on or after 2026-02-01.
+  Sort: Date descending.
+  Show: Name, Date, Type, Distance (km), Duration, Avg Pace, Avg HR, Max HR, Calories.
+  Hide: SubType, Avg Power, Training Effect, Aerobic Effect, Anaerobic Effect, Steps, Day of Week, Hour Block, Garmin ID.
+
+- "All Activities" — Table view. No filter. Sort: Date descending. Show all columns.
+
+- "By Type" — Board view, grouped by Type. Sort: Date descending.
+
+- "Activity Heatmap" — Board view, grouped by Day of Week.
+  Group order: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.
+  Sort: Hour Block ascending.
+  Card preview: show Hour Block, Type, Duration. Hide all other properties on cards.
+
+---
+
+6. Database "Personal Records"
+
+Properties:
+- Name (Title)
+- Record (Rich text)
+- Activity (Rich text)
+- Date (Date)
+- Icon (Rich text)
+
+Create exactly 2 views:
+- "All Records" — Table view. Sort: Date descending. DEFAULT.
+- "Gallery" — Gallery view.
+
+---
+
+DESIGN RULES — apply to all databases:
+- All databases must be INLINE (not full-page) and FULL WIDTH.
+- Table, board, and calendar views: sort by date DESCENDING (most recent first).
+- Chart X-axes: sort ASCENDING (oldest on the left, newest on the right).
+- Clean, minimal, spacious layout. No unnecessary decoration.
+- Do NOT add any sample/placeholder data. Leave all databases empty.
+- Consistent spacing between sections.
+
+---
+
+POST-CREATION CHECKLIST (for the user, not for Notion AI):
+
+After this prompt runs, manually convert these date filters to relative filters in the Notion UI. Open each view's filter settings, delete the "is on or after [date]" filter, and replace it with the relative filter shown below:
+
+Activity Summary:
+  Overview → change Start filter to: "is within" → "Past year"
+  This Month → change Start filter to: "is within" → "This month"
+  Year to Date → change Start filter to: "is within" → "This year"
+  Monthly Trend → change Start filter to: "is within" → "Past year"
+  Sport Distribution → change Start filter to: "is within" → "This year"
+
+Workouts:
+  Recent → change Date filter to: "is within" → "Past month"
+
+Daily Steps:
+  Recent → change Date filter to: "is within" → "Past month"
+
+Sleep:
+  Recent → change Date filter to: "is within" → "Past month"
+  Sleep Score Trend → change Date filter to: "is within" → "Past month"
+
+Activities:
+  Recent → change Date filter to: "is within" → "Past month"

@@ -1,0 +1,191 @@
+I need to update this Fitness Tracker page. Follow every instruction carefully:
+
+IMPORTANT — Date filters: Whenever a filter says "on or after [date]", use the Date filter → "is on or after" → type the date shown. These are temporary placeholders — I will convert them to relative filters after.
+
+---
+
+STEP 1 — RENAME SUMMARY DATABASE
+
+Rename the "Summary" database to "Activity Summary".
+
+---
+
+STEP 2 — ACTIVITY SUMMARY DATABASE
+
+In the "Activity Summary" database:
+
+a) Add these new properties (if they don't exist already):
+   - "Active Days" (Number, integer)
+   - "Avg HR" (Number, integer)
+   - "Avg Sleep" (Rich text)
+   - "Avg Sleep Score" (Number, integer)
+   - "Avg Resting HR" (Number, integer)
+   - "Avg Steps" (Number, integer)
+   - "Step Goal %" (Number, integer)
+
+b) Add these new Modality select options (if they don't exist):
+   Crossfit (red), Racquet Sports (blue), Team Sports (green), Combat Sports (brown), Winter Sports (blue), Water Sports (purple), Climbing (orange), Golf (green), Dance (pink), Multi Sport (gray)
+
+c) Delete ALL existing views and create exactly 6 views:
+
+   - "Overview" — Table view. DEFAULT VIEW.
+     Filter: 3 conditions, AND:
+       Modality is "All"
+       Period is "Month"
+       Start is on or after 2025-03-01
+     Sort: Start descending.
+     Show columns: Name, Total Workouts, Active Days, Total Duration (min), Total Distance (km), Total Calories, Avg per Week, Avg HR, Avg Sleep, Avg Sleep Score, Avg Resting HR, Avg Steps, Step Goal %.
+     Hide columns: Period, Modality, Start, End, Top Modality, Breakdown.
+
+   - "This Month" — Table view.
+     Filter: 2 conditions, AND:
+       Period is "Month"
+       Start is on or after 2026-03-01
+     Sort: Total Workouts descending.
+     Show columns: Modality, Total Workouts, Total Duration (min), Total Distance (km), Total Calories, Avg per Week, Avg HR.
+     Hide columns: Name, Period, Start, End, Top Modality, Breakdown, Active Days, Avg Sleep, Avg Sleep Score, Avg Resting HR, Avg Steps, Step Goal %.
+
+   - "Year to Date" — Table view.
+     Filter: 2 conditions, AND:
+       Period is "Year"
+       Start is on or after 2026-01-01
+     Sort: Total Workouts descending.
+     Show columns: Modality, Total Workouts, Total Duration (min), Total Distance (km), Total Calories, Avg per Week, Avg HR.
+     Hide columns: Name, Period, Start, End, Top Modality, Breakdown, Active Days, Avg Sleep, Avg Sleep Score, Avg Resting HR, Avg Steps, Step Goal %.
+
+   - "Yearly" — Table view.
+     Filter: 2 conditions, AND:
+       Period is "Year"
+       Modality is "All"
+     Sort: Start descending.
+     Show columns: Name, Total Workouts, Active Days, Total Duration (min), Total Distance (km), Total Calories, Avg per Week, Avg HR, Avg Sleep, Avg Sleep Score, Avg Resting HR, Avg Steps, Step Goal %.
+     Hide columns: Period, Modality, Start, End, Top Modality, Breakdown.
+
+   - "Monthly Trend" — CHART view.
+     Chart type: Vertical bar.
+     Filter: 3 conditions, AND:
+       Modality is "All"
+       Period is "Month"
+       Start is on or after 2025-03-01
+     X-axis: select the property called "Start" (Date property).
+     Y-axis: select the property called "Total Workouts" (Number property). Do NOT choose "Count".
+     Sort: ascending (oldest month on the left, newest on the right).
+     Do NOT group. Do NOT add color/slice.
+     Style: medium height, show data labels, show grid lines.
+
+   - "Sport Distribution" — CHART view.
+     Chart type: Donut.
+     Filter: 3 conditions, AND:
+       Period is "Year"
+       Start is on or after 2026-01-01
+       Modality is not "All"
+     Measure: select "Total Workouts" (Number property, NOT "Count").
+     Slice by: Modality.
+     Style: medium height, show data labels, show legend.
+
+---
+
+STEP 3 — WORKOUTS DATABASE
+
+a) Add this new property (if it doesn't exist already):
+   - "Avg HR" (Number, integer)
+
+b) Add these new Modality select options (if they don't exist):
+   Crossfit (red), Racquet Sports (blue), Team Sports (green), Combat Sports (brown), Winter Sports (blue), Water Sports (purple), Climbing (orange), Golf (green), Dance (pink), Multi Sport (gray)
+
+c) Delete ALL existing views and create exactly 4 views:
+
+- "Recent" — Table view. DEFAULT VIEW.
+  Filter: Date is on or after 2026-02-01. Sort: Date descending.
+  Show: Workout, Date, Modality, Intensity, Duration, Distance (km), Calories, Avg HR.
+  Hide: Avg Pace, Source, Garmin ID.
+
+- "All Workouts" — Table view. No filter. Sort: Date descending. Show all columns.
+
+- "By Modality" — Board view, grouped by Modality. Sort: Date descending.
+  Card preview: show only Date and Duration. Hide all other properties on cards.
+
+- "Calendar" — Calendar view by Date.
+
+---
+
+STEP 4 — DAILY STEPS DATABASE
+
+Delete ALL existing views and create exactly 3 views:
+
+- "Calendar" — Calendar view by Date. No filter. DEFAULT VIEW.
+- "Recent" — Table view. Filter: Date is on or after 2026-02-01. Sort: Date descending.
+- "All Days" — Table view. No filter. Sort: Date descending.
+
+---
+
+STEP 5 — SLEEP DATABASE
+
+a) Add this new property (if it doesn't exist already):
+   - "Score" (Number, integer)
+
+b) Delete ALL existing views and create exactly 4 views:
+
+- "Calendar" — Calendar view by Date. No filter. DEFAULT VIEW.
+- "Recent" — Table view. Filter: Date is on or after 2026-02-01. Sort: Date descending.
+- "All Nights" — Table view. No filter. Sort: Date descending.
+
+- "Sleep Score Trend" — CHART view.
+  Chart type: Line.
+  Filter: 2 conditions, AND:
+    Date is on or after 2026-02-01
+    Score is not empty
+  X-axis: select the property called "Date" (Date property).
+  Y-axis: select the property called "Score" (Number property). Do NOT choose "Count".
+  Sort: ascending (oldest date on the left, newest on the right).
+  Do NOT group. Do NOT add color/slice.
+  Style: medium height, smooth line, gradient area fill, show data labels.
+
+---
+
+STEP 6 — ACTIVITIES DATABASE
+
+a) Add these new properties (if they don't exist):
+   - "Day of Week" (Select) — options: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
+   - "Hour Block" (Select) — options: 00:00-02:00, 02:00-04:00, 04:00-06:00, 06:00-08:00, 08:00-10:00, 10:00-12:00, 12:00-14:00, 14:00-16:00, 16:00-18:00, 18:00-20:00, 20:00-22:00, 22:00-24:00
+
+b) Add these new Type select options (if they don't exist):
+   HIIT (pink), Rowing (blue), Combat Sports (brown), Racquet Sports (blue), Team Sports (green), Winter Sports (blue), Water Sports (purple), Climbing (orange), Multi Sport (gray)
+
+c) Delete ALL existing views and create exactly 4 views:
+
+- "Recent" — Table view. DEFAULT VIEW.
+  Filter: Date is on or after 2026-02-01. Sort: Date descending.
+  Show: Name, Date, Type, Distance (km), Duration, Avg Pace, Avg HR, Max HR, Calories.
+  Hide: SubType, Avg Power, Training Effect, Aerobic Effect, Anaerobic Effect, Steps, Day of Week, Hour Block, Garmin ID.
+
+- "All Activities" — Table view. No filter. Sort: Date descending. Show all columns.
+
+- "By Type" — Board view, grouped by Type. Sort: Date descending.
+
+- "Activity Heatmap" — Board view, grouped by Day of Week.
+  Group order: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.
+  Sort: Hour Block ascending.
+  Card preview: show Hour Block, Type, Duration. Hide all other properties on cards.
+
+---
+
+STEP 7 — PERSONAL RECORDS DATABASE
+
+Make sure the "All Records" view sorts by Date DESCENDING.
+
+---
+
+STEP 8 — GLOBAL CHECK
+
+Go through EVERY view in EVERY database and confirm:
+- Table/board/calendar views: sort by date DESCENDING (most recent at top).
+- Chart X-axes: sort ASCENDING (oldest left, newest right).
+
+---
+
+STEP 9 — DESIGN CLEANUP
+
+- All databases must be inline and full-width.
+- Consistent spacing between sections.
+- Clean, minimal, spacious layout.
