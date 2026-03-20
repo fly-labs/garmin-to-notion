@@ -1,6 +1,6 @@
 # Garmin to Notion
 
-Sync your Garmin fitness data to beautiful Notion databases — activities, personal records, steps, sleep, workouts, and monthly summaries. Fully automated via GitHub Actions, every 6 hours.
+Sync your Garmin fitness data to beautiful Notion databases — activities, personal records, steps, sleep, workouts, and monthly summaries. Fully automated via GitHub Actions, 3 times a day.
 
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
@@ -17,7 +17,7 @@ Sync your Garmin fitness data to beautiful Notion databases — activities, pers
 - **60+ activity types** — running, cycling, swimming, strength, BJJ, climbing, winter sports, and more
 - **Auto-discovery** — finds your Notion databases by name, no manual IDs needed
 - **Timezone-aware** — configurable via `TIMEZONE` variable, all timestamps are correct
-- **Zero-touch automation** — runs every 6 hours via GitHub Actions (free tier friendly)
+- **Zero-touch automation — runs 3x/day via GitHub Actions (free tier friendly))
 
 ## Setup Guide
 
@@ -69,7 +69,7 @@ Go to **Settings → Secrets and variables → Actions → Variables** and add:
 
 Go to the **Actions** tab → **Garmin to Notion Sync** → **Run workflow**.
 
-Your data will appear in Notion within a few minutes. After that, the sync runs automatically every 6 hours.
+Your data will appear in Notion within a few minutes. After that, the sync runs automatically 3 times a day.
 
 ## How It Works
 
