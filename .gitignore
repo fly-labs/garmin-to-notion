@@ -32,6 +32,9 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
+# Garmin auth tokens
+.garmin_tokens/
+
 # Claude Code
 .claude/
 
