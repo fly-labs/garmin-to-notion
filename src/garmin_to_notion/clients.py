@@ -27,24 +27,38 @@ class Clients:
 def init_clients(settings: Settings) -> Clients:
     """Initialize and authenticate both Garmin and Notion clients.
 
-    Tries cached tokens first, falls back to credential login with retry.
+    Auth priority:
+    1. GARMIN_TOKENS env var (base64 string, set via scripts/generate_tokens.py)
+    2. Cached tokens on disk (~/.garmin_tokens)
+    3. Fresh credential login with retry + backoff
     """
     logger.info("Authenticating with Garmin Connect...")
-    garmin = GarminClient(settings.garmin_email, settings.garmin_password)
 
-    # Try cached tokens first (avoids fresh login / rate limits)
+    # 1. Try GARMIN_TOKENS env var (base64 string from GitHub secret)
+    token_string = os.getenv("GARMIN_TOKENS", "").strip()
+    if token_string:
+        try:
+            garmin = GarminClient(settings.garmin_email, settings.garmin_password)
+            garmin.login(tokenstore=token_string)
+            logger.info("Garmin authentication successful (GARMIN_TOKENS secret)")
+            _save_tokens(garmin)
+            return Clients(garmin=garmin, notion=NotionClient(auth=settings.notion_token))
+        except Exception as e:
+            logger.warning("GARMIN_TOKENS expired or invalid: %s", e)
+
+    # 2. Try cached tokens on disk
     tokenstore = str(TOKENSTORE_DIR) if TOKENSTORE_DIR.exists() else None
     if tokenstore:
         try:
+            garmin = GarminClient(settings.garmin_email, settings.garmin_password)
             garmin.login(tokenstore=tokenstore)
             logger.info("Garmin authentication successful (cached tokens)")
             _save_tokens(garmin)
-            notion = NotionClient(auth=settings.notion_token)
-            return Clients(garmin=garmin, notion=notion)
+            return Clients(garmin=garmin, notion=NotionClient(auth=settings.notion_token))
         except Exception as e:
             logger.warning("Cached tokens expired or invalid: %s. Trying fresh login...", e)
 
-    # Fresh login with retry + exponential backoff
+    # 3. Fresh login with retry + exponential backoff
     max_retries = 3
     for attempt in range(1, max_retries + 1):
         try:
@@ -52,8 +66,7 @@ def init_clients(settings: Settings) -> Clients:
             garmin.login()
             logger.info("Garmin authentication successful (fresh login)")
             _save_tokens(garmin)
-            notion = NotionClient(auth=settings.notion_token)
-            return Clients(garmin=garmin, notion=notion)
+            return Clients(garmin=garmin, notion=NotionClient(auth=settings.notion_token))
         except Exception as e:
             if attempt < max_retries and "429" in str(e):
                 wait = 30 * attempt
