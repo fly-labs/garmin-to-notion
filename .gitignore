@@ -9,9 +9,16 @@ build/
 
 # Virtual environments
 .env
+.env.*
 .venv/
 venv/
 env/
+
+# Secrets & credentials
+*.pem
+*.key
+credentials.json
+service-account*.json
 
 # IDE
 .idea/
