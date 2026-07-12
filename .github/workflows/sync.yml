@@ -49,4 +49,6 @@ jobs:
           GARMIN_DAYS_BACK: ${{ vars.GARMIN_DAYS_BACK || '30' }}
           GARMIN_ACTIVITIES_FETCH_LIMIT: ${{ vars.GARMIN_ACTIVITIES_FETCH_LIMIT || '1000' }}
           PYTHONPATH: src
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
         run: python -m garmin_to_notion all
