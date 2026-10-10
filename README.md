@@ -163,6 +163,21 @@ PYTHONPATH=src python -m garmin_to_notion cleanup --execute
 PYTHONPATH=src python -m garmin_to_notion all -v
 ```
 
+### Generate Garmin tokens
+
+Run `python scripts/generate_tokens.py` to generate the token string for your `GARMIN_TOKENS` GitHub secret. The script reads `GARMIN_EMAIL` and `GARMIN_PASSWORD` from the environment or `.env` and prompts for any missing values, hiding the password input. If Garmin requires MFA, enter the verification code when prompted.
+
+To run it in Docker from the repository root:
+
+```bash
+docker run --rm -it \
+  --user "$(id -u):$(id -g)" -e HOME=/tmp \
+  --cap-drop ALL --security-opt no-new-privileges \
+  -v "$PWD:/work" -w /work \
+  python:3.12-slim \
+  sh -c 'pip install -q --user "garminconnect>=0.2.19,<0.3" "python-dotenv>=1.0,<2.0" && python scripts/generate_tokens.py'
+```
+
 ## Project Structure
 
 ```
